@@ -27,7 +27,7 @@ data class AuthResponse(
 // UI Data Structures based on design
 @Serializable
 data class StudentProfileResponse(
-    val id: Int,
+    val id: String,
     val fullName: String,
     val enrollmentNumber: String,
     val branchDepartment: String,
@@ -39,7 +39,7 @@ data class StudentProfileResponse(
 
 @Serializable
 data class EventSummaryResponse(
-    val id: Int,
+    val id: String,
     val title: String,
     val clubName: String,
     val date: String,
@@ -50,7 +50,7 @@ data class EventSummaryResponse(
 
 @Serializable
 data class EventDetailResponse(
-    val id: Int,
+    val id: String,
     val title: String,
     val clubName: String,
     val bannerUrl: String,

@@ -25,7 +25,7 @@ fun Route.eventRouting(eventService: EventService) {
             get("/{id}") {
                 val principal = call.principal<JWTPrincipal>()
                 val enrollmentNo = principal?.getClaim("enrollmentNumber", String::class) ?: ""
-                val eventId = call.parameters["id"]?.toIntOrNull() ?: return@get call.respond(
+                val eventId = call.parameters["id"] ?: return@get call.respond(
                     HttpStatusCode.BadRequest, GenericResponse(false, "Malformed or missing ID")
                 )
 
@@ -40,7 +40,7 @@ fun Route.eventRouting(eventService: EventService) {
             post("/{id}/register") {
                 val principal = call.principal<JWTPrincipal>()
                 val enrollmentNo = principal?.getClaim("enrollmentNumber", String::class) ?: ""
-                val eventId = call.parameters["id"]?.toIntOrNull() ?: return@post call.respond(
+                val eventId = call.parameters["id"] ?: return@post call.respond(
                     HttpStatusCode.BadRequest, GenericResponse(false, "Invalid Event ID")
                 )
 
@@ -55,7 +55,7 @@ fun Route.eventRouting(eventService: EventService) {
             post("/{id}/deregister") {
                 val principal = call.principal<JWTPrincipal>()
                 val enrollmentNo = principal?.getClaim("enrollmentNumber", String::class) ?: ""
-                val eventId = call.parameters["id"]?.toIntOrNull() ?: return@post call.respond(
+                val eventId = call.parameters["id"] ?: return@post call.respond(
                     HttpStatusCode.BadRequest, GenericResponse(false, "Invalid Event ID")
                 )
 

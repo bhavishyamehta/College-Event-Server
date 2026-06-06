@@ -31,7 +31,7 @@ class EventService {
         }
     }
 
-    suspend fun getEventDetail(eventId: Int, enrollmentNo: String): EventDetailResponse? = dbQuery {
+    suspend fun getEventDetail(eventId: String, enrollmentNo: String): EventDetailResponse? = dbQuery {
         val eventRow = EventsTable.select { EventsTable.id eq eventId }.singleOrNull() ?: return@dbQuery null
         val studentRow = StudentsTable.select { StudentsTable.enrollmentNumber eq enrollmentNo }.singleOrNull() ?: return@dbQuery null
         
@@ -61,7 +61,7 @@ class EventService {
         )
     }
 
-    suspend fun registerForEvent(eventId: Int, enrollmentNo: String): Boolean = dbQuery {
+    suspend fun registerForEvent(eventId: String, enrollmentNo: String): Boolean = dbQuery {
         val studentRow = StudentsTable.select { StudentsTable.enrollmentNumber eq enrollmentNo }.singleOrNull() ?: return@dbQuery false
         val sId = studentRow[StudentsTable.id]
         
@@ -83,7 +83,7 @@ class EventService {
         true
     }
 
-    suspend fun deregisterFromEvent(eventId: Int, enrollmentNo: String): Boolean = dbQuery {
+    suspend fun deregisterFromEvent(eventId: String, enrollmentNo: String): Boolean = dbQuery {
         val studentRow = StudentsTable.select { StudentsTable.enrollmentNumber eq enrollmentNo }.singleOrNull() ?: return@dbQuery false
         val sId = studentRow[StudentsTable.id]
 

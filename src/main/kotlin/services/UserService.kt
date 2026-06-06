@@ -7,7 +7,6 @@ import database.EventRegistrationsTable
 import database.EventsTable
 import database.StudentsTable
 import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.selectAll
 
 class UserService {
 

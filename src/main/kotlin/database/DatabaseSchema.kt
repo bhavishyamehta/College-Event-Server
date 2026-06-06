@@ -3,7 +3,7 @@ package database
 import org.jetbrains.exposed.sql.Table
 
 object StudentsTable : Table("students") {
-    val id = integer("id").autoIncrement()
+    val id = varchar("id", 50)
     val fullName = varchar("full_name", 255)
     val enrollmentNumber = varchar("enrollment_number", 50).uniqueIndex()
     val branchDepartment = varchar("branch_department", 100)
@@ -15,7 +15,7 @@ object StudentsTable : Table("students") {
 }
 
 object EventsTable : Table("events") {
-    val id = integer("id").autoIncrement()
+    val id = varchar("id", 50)
     val title = varchar("title", 255)
     val clubName = varchar("club_name", 150)
     val bannerUrl = varchar("banner_url", 500)
@@ -32,9 +32,9 @@ object EventsTable : Table("events") {
 }
 
 object EventRegistrationsTable : Table("event_registrations") {
-    val id = integer("id").autoIncrement()
-    val studentId = integer("student_id").references(StudentsTable.id)
-    val eventId = integer("event_id").references(EventsTable.id)
+    val id = varchar("id", 50)
+    val studentId = varchar("student_id", 50).references(StudentsTable.id)
+    val eventId = varchar("event_id", 50).references(EventsTable.id)
 
     override val primaryKey = PrimaryKey(id)
 
