@@ -9,7 +9,8 @@ data class RegisterRequest(
     val enrollmentNumber: String,
     val branchDepartment: String,
     val universityEmail: String,
-    val password: String
+    val password: String,
+    val role: String = "STUDENT"
 )
 
 @Serializable
@@ -34,7 +35,23 @@ data class StudentProfileResponse(
     val universityEmail: String,
     val totalEvents: Int,
     val certificatesCount: Int,
-    val registeredEvents: List<EventSummaryResponse>
+    val registeredEvents: List<EventSummaryResponse>,
+    val role: String
+)
+
+@Serializable
+data class CreateEventRequest(
+    val title: String,
+    val clubName: String,
+    val bannerUrl: String,
+    val eventDate: String,
+    val eventTime: String,
+    val venue: String,
+    val description: String,
+    val totalSeats: Int,
+    val registrationFee: String,
+    val category: String,
+    val statusBadge: String = "Registration Open"
 )
 
 @Serializable

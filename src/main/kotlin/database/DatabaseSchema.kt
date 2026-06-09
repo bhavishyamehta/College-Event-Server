@@ -2,8 +2,9 @@ package database
 
 import org.jetbrains.exposed.sql.Table
 
-object StudentsTable : Table("students") {
+object UsersTable : Table("users") {
     val id = varchar("id", 50)
+    val role = varchar("role", 20).default("STUDENT") // STUDENT, TEACHER, ADMIN
     val fullName = varchar("full_name", 255)
     val enrollmentNumber = varchar("enrollment_number", 50).uniqueIndex()
     val branchDepartment = varchar("branch_department", 100)
@@ -32,8 +33,8 @@ object EventsTable : Table("events") {
 }
 
 object EventRegistrationsTable : Table("event_registrations") {
-    val id = varchar("id", 50)
-    val studentId = varchar("student_id", 50).references(StudentsTable.id)
+    val id = varchar("id", 50).clientDefault { java.util.UUID.randomUUID().toString() }
+    val studentId = varchar("student_id", 50).references(UsersTable.id)
     val eventId = varchar("event_id", 50).references(EventsTable.id)
 
     override val primaryKey = PrimaryKey(id)

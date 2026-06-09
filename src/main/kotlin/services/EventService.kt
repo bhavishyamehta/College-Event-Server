@@ -1,13 +1,15 @@
 package services
 
+import com.example.domain.CreateEventRequest
 import com.example.domain.EventDetailResponse
 import com.example.domain.EventSummaryResponse
 import config.DatabaseFactory.dbQuery
 import database.EventRegistrationsTable
 import database.EventsTable
-import database.StudentsTable
+import database.UsersTable
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import java.util.UUID
 
 class EventService {
 
@@ -33,9 +35,9 @@ class EventService {
 
     suspend fun getEventDetail(eventId: String, enrollmentNo: String): EventDetailResponse? = dbQuery {
         val eventRow = EventsTable.select { EventsTable.id eq eventId }.singleOrNull() ?: return@dbQuery null
-        val studentRow = StudentsTable.select { StudentsTable.enrollmentNumber eq enrollmentNo }.singleOrNull() ?: return@dbQuery null
+        val studentRow = UsersTable.select { UsersTable.enrollmentNumber eq enrollmentNo }.singleOrNull() ?: return@dbQuery null
         
-        val studentId = studentRow[StudentsTable.id]
+        val studentId = studentRow[UsersTable.id]
         
         // Count actual registrations for this event
         val currentRegsCount = EventRegistrationsTable.select { EventRegistrationsTable.eventId eq eventId }.count().toInt()
@@ -62,8 +64,8 @@ class EventService {
     }
 
     suspend fun registerForEvent(eventId: String, enrollmentNo: String): Boolean = dbQuery {
-        val studentRow = StudentsTable.select { StudentsTable.enrollmentNumber eq enrollmentNo }.singleOrNull() ?: return@dbQuery false
-        val sId = studentRow[StudentsTable.id]
+        val studentRow = UsersTable.select { UsersTable.enrollmentNumber eq enrollmentNo }.singleOrNull() ?: return@dbQuery false
+        val sId = studentRow[UsersTable.id]
         
         // Already registered validation
         val alreadyExists = EventRegistrationsTable.select {
@@ -77,6 +79,7 @@ class EventService {
         if (currentRegsCount >= eventRow[EventsTable.totalSeats]) return@dbQuery false // Housefull
 
         EventRegistrationsTable.insert {
+            it[id] = UUID.randomUUID().toString()
             it[studentId] = sId
             it[this.eventId] = eventId
         }
@@ -84,12 +87,60 @@ class EventService {
     }
 
     suspend fun deregisterFromEvent(eventId: String, enrollmentNo: String): Boolean = dbQuery {
-        val studentRow = StudentsTable.select { StudentsTable.enrollmentNumber eq enrollmentNo }.singleOrNull() ?: return@dbQuery false
-        val sId = studentRow[StudentsTable.id]
+        val studentRow = UsersTable.select { UsersTable.enrollmentNumber eq enrollmentNo }.singleOrNull() ?: return@dbQuery false
+        val sId = studentRow[UsersTable.id]
 
         val deletedCount = EventRegistrationsTable.deleteWhere {
             (studentId eq sId) and (EventRegistrationsTable.eventId eq eventId)
         }
         deletedCount > 0
+    }
+
+    // ── 1. CREATE EVENT (Accessible only by TEACHER/ADMIN) ───────────────────
+    suspend fun createEvent(req: CreateEventRequest): String? = dbQuery {
+        val newId = "event-" + UUID.randomUUID().toString().take(8)
+
+        EventsTable.insert {
+            it[id] = newId
+            it[title] = req.title
+            it[clubName] = req.clubName
+            it[bannerUrl] = req.bannerUrl
+            it[eventDate] = req.eventDate
+            it[eventTime] = req.eventTime
+            it[venue] = req.venue
+            it[description] = req.description
+            it[totalSeats] = req.totalSeats
+            it[registrationFee] = req.registrationFee
+            it[category] = req.category
+            it[statusBadge] = req.statusBadge
+        }
+        newId
+    }
+
+    // ── 2. UPDATE EVENT (Accessible only by TEACHER/ADMIN) ───────────────────
+    suspend fun updateEvent(eventId: String, req: CreateEventRequest): Boolean = dbQuery {
+        val updatedRows = EventsTable.update({ EventsTable.id eq eventId }) {
+            it[title] = req.title
+            it[clubName] = req.clubName
+            it[bannerUrl] = req.bannerUrl
+            it[eventDate] = req.eventDate
+            it[eventTime] = req.eventTime
+            it[venue] = req.venue
+            it[description] = req.description
+            it[totalSeats] = req.totalSeats
+            it[registrationFee] = req.registrationFee
+            it[category] = req.category
+            it[statusBadge] = req.statusBadge
+        }
+        updatedRows > 0
+    }
+
+    // ── 3. DELETE EVENT (Accessible only by TEACHER/ADMIN) ───────────────────
+    suspend fun deleteEvent(eventId: String): Boolean = dbQuery {
+        // First delete cascade handling for references inside registrations to avoid relational foreign key errors
+        EventRegistrationsTable.deleteWhere { EventRegistrationsTable.eventId eq eventId }
+
+        val deletedRows = EventsTable.deleteWhere { EventsTable.id eq eventId }
+        deletedRows > 0
     }
 }

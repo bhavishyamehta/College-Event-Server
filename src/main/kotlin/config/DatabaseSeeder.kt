@@ -2,7 +2,7 @@ package config
 
 import database.EventRegistrationsTable
 import database.EventsTable
-import database.StudentsTable
+import database.UsersTable
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationStarted
 import mu.KotlinLogging
@@ -10,25 +10,29 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt
+import java.util.UUID
 
 private val logger = KotlinLogging.logger {}
 
 // ── Fixed UUID IDs for cross-references ──────────────────────────────────────
-private const val STUDENT_ALEX_ID = "seed-stud-alex-0000-000000000001"
+private const val STUDENT_ALEX_ID  = "seed-stud-alex-0000-000000000001"
+private const val TEACHER_VIKRAM_ID = "seed-tech-vikr-0000-000000000002"
+private const val ADMIN_NEHA_ID     = "seed-admn-neha-0000-000000000003"
 
 private const val EVENT_TECH_ID   = "seed-even-tech-0000-000000000010"
 private const val EVENT_BANDS_ID  = "seed-even-band-0000-000000000011"
 private const val EVENT_UIUX_ID   = "seed-even-uiux-0000-000000000012"
 private const val EVENT_BASKET_ID = "seed-even-bask-0000-000000000013"
 
-private data class SeedStudent(
+private data class SeedUser(
     val id: String,
     val fullName: String,
-    val enrollmentNumber: String,
+    val enrollmentNumber: String, // Acts as UserID/EmployeeID for staff
     val branchDepartment: String,
     val universityEmail: String,
     val passwordPlain: String,
-    val certificatesCount: Int
+    val role: String,
+    val certificatesCount: Int = 0
 )
 
 private data class SeedEvent(
@@ -50,9 +54,9 @@ fun Application.databaseSeeder() {
     environment.monitor.subscribe(ApplicationStarted) {
         try {
             transaction {
-                // Idempotency guard — check if Alex Thompson already exists
-                val alreadySeeded = StudentsTable
-                    .select { StudentsTable.enrollmentNumber eq "ENR2024-884920" }
+                // Idempotency guard — check if the core student already exists
+                val alreadySeeded = UsersTable
+                    .select { UsersTable.enrollmentNumber eq "ENR2024-884920" }
                     .firstOrNull()
 
                 if (alreadySeeded != null) {
@@ -60,9 +64,9 @@ fun Application.databaseSeeder() {
                     return@transaction
                 }
 
-                logger.info { "🚀 Seeding UI-Matched College Events and Demo Student data..." }
+                logger.info { "🚀 Seeding Role-Based College Users and UI-Matched Events..." }
 
-                seedStudents()
+                seedUsers()
                 seedEvents()
                 seedRegistrations()
 
@@ -70,14 +74,19 @@ fun Application.databaseSeeder() {
                     """
                     
                     ╔══════════════════════════════════════════════════════════════╗
-                    ║            COLLEGE EVENT DEMO SEED COMPLETE                  ║
+                    ║            COLLEGE EVENT ROLE-BASED SEED COMPLETE            ║
                     ╠══════════════════════════════════════════════════════════════╣
-                    ║  Enrollment No  → ENR2024-884920                             ║
-                    ║  Password       → password123                                ║
-                    ║  Student Name   → Alex Thompson                              ║
+                    ║  1. STUDENT ROLE:                                            ║
+                    ║     ID/Enr   → ENR2024-884920 | Pass: password123            ║
+                    ║     Name     → Alex Thompson (Pre-registered in 2 events)    ║
                     ║                                                              ║
-                    ║  Seeded Events  → 4 Events (Tech, Music, UI/UX, Basketball)  ║
-                    ║  Pre-Registered → Future Tech Summit & Battle of the Bands   ║
+                    ║  2. TEACHER ROLE:                                            ║
+                    ║     ID/Emp   → TCH2026-112233 | Pass: teacher123             ║
+                    ║     Name     → Prof. Vikram Malhotra                         ║
+                    ║                                                              ║
+                    ║  3. ADMIN ROLE:                                              ║
+                    ║     ID/Emp   → ADM2026-998877 | Pass: admin123               ║
+                    ║     Name     → Neha Sharma (Full System Control)             ║
                     ╚══════════════════════════════════════════════════════════════╝
                     """.trimIndent()
                 }
@@ -90,30 +99,50 @@ fun Application.databaseSeeder() {
 
 // ── Private Seed Helpers ─────────────────────────────────────────────────────
 
-private fun seedStudents() {
-    val students = listOf(
-        SeedStudent(
+private fun seedUsers() {
+    val users = listOf(
+        SeedUser(
             id = STUDENT_ALEX_ID,
             fullName = "Alex Thompson",
             enrollmentNumber = "ENR2024-884920",
             branchDepartment = "B.Tech - Computer Science",
             universityEmail = "alex.thompson@university.edu",
             passwordPlain = "password123",
+            role = "STUDENT",
             certificatesCount = 4
+        ),
+        SeedUser(
+            id = TEACHER_VIKRAM_ID,
+            fullName = "Prof. Vikram Malhotra",
+            enrollmentNumber = "TCH2026-112233", // Staff ID used as enrollment key
+            branchDepartment = "Department of AI & Robotics",
+            universityEmail = "vikram.malhotra@university.edu",
+            passwordPlain = "teacher123",
+            role = "TEACHER"
+        ),
+        SeedUser(
+            id = ADMIN_NEHA_ID,
+            fullName = "Neha Sharma",
+            enrollmentNumber = "ADM2026-998877", // Admin ID used as enrollment key
+            branchDepartment = "University Administration Center",
+            universityEmail = "neha.admin@university.edu",
+            passwordPlain = "admin123",
+            role = "ADMIN"
         )
     )
 
-    students.forEach { student ->
-        StudentsTable.insert {
-            it[id] = student.id
-            it[fullName] = student.fullName
-            it[enrollmentNumber] = student.enrollmentNumber
-            it[branchDepartment] = student.branchDepartment
-            it[universityEmail] = student.universityEmail
-            it[passwordHash] = BCrypt.hashpw(student.passwordPlain, BCrypt.gensalt(10))
-            it[certificatesCount] = student.certificatesCount
+    users.forEach { user ->
+        UsersTable.insert {
+            it[id] = user.id
+            it[fullName] = user.fullName
+            it[enrollmentNumber] = user.enrollmentNumber
+            it[branchDepartment] = user.branchDepartment
+            it[universityEmail] = user.universityEmail
+            it[passwordHash] = BCrypt.hashpw(user.passwordPlain, BCrypt.gensalt(10))
+            it[certificatesCount] = user.certificatesCount
+            it[role] = user.role // 👈 Enforces matching roles assignment natively inside the DB
         }
-        logger.debug { "  Seeded Student: ${student.fullName} (${student.enrollmentNumber})" }
+        logger.debug { "  Seeded User: ${user.fullName} [Role: ${user.role}]" }
     }
 }
 
@@ -197,11 +226,6 @@ private fun seedEvents() {
 }
 
 private fun seedRegistrations() {
-    // Screenshot ke 'Student Profile' me Alex Thompson ke status me 2 items registered dikhaye hain:
-    // 1. Global AI Summit (Future Tech Summit)
-    // 2. Battle of the Bands (or Annual Sports Carnival)
-    // Hum Alex ko in dono main events me pre-register kar dete hain testing ke liye.
-
     val registrations = listOf(
         EVENT_TECH_ID,
         EVENT_BANDS_ID
@@ -209,7 +233,7 @@ private fun seedRegistrations() {
 
     registrations.forEach { eventId ->
         EventRegistrationsTable.insert {
-            it[id] = java.util.UUID.randomUUID().toString()
+            it[id] = UUID.randomUUID().toString()
             it[studentId] = STUDENT_ALEX_ID
             it[this.eventId] = eventId
         }

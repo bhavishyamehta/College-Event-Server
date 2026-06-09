@@ -11,3 +11,4 @@ out/
 
 ### Environmental variables ###
 .env
+src/main/kotlin/config/SupabaseConfig.kt

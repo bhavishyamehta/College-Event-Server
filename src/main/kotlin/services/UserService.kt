@@ -5,14 +5,14 @@ import com.example.domain.StudentProfileResponse
 import config.DatabaseFactory.dbQuery
 import database.EventRegistrationsTable
 import database.EventsTable
-import database.StudentsTable
+import database.UsersTable
 import org.jetbrains.exposed.sql.select
 
 class UserService {
 
     suspend fun getStudentProfile(enrollmentNo: String): StudentProfileResponse? = dbQuery {
-        val studentRow = StudentsTable.select { StudentsTable.enrollmentNumber eq enrollmentNo }.singleOrNull() ?: return@dbQuery null
-        val sId = studentRow[StudentsTable.id]
+        val studentRow = UsersTable.select { UsersTable.enrollmentNumber eq enrollmentNo }.singleOrNull() ?: return@dbQuery null
+        val sId = studentRow[UsersTable.id]
 
         // Count registrations
         val registeredEventIds = EventRegistrationsTable
@@ -35,15 +35,18 @@ class UserService {
             emptyList()
         }
 
+        val userRole = studentRow[UsersTable.role]
+
         StudentProfileResponse(
             id = sId,
-            fullName = studentRow[StudentsTable.fullName],
-            enrollmentNumber = studentRow[StudentsTable.enrollmentNumber],
-            branchDepartment = studentRow[StudentsTable.branchDepartment],
-            universityEmail = studentRow[StudentsTable.universityEmail],
+            fullName = studentRow[UsersTable.fullName],
+            enrollmentNumber = studentRow[UsersTable.enrollmentNumber],
+            branchDepartment = studentRow[UsersTable.branchDepartment],
+            universityEmail = studentRow[UsersTable.universityEmail],
             totalEvents = registeredEventsList.size,
-            certificatesCount = studentRow[StudentsTable.certificatesCount],
-            registeredEvents = registeredEventsList
+            certificatesCount = studentRow[UsersTable.certificatesCount],
+            registeredEvents = registeredEventsList,
+            role = userRole,
         )
     }
 }

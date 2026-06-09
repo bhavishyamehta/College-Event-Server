@@ -4,7 +4,7 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import database.EventRegistrationsTable
 import database.EventsTable
-import database.StudentsTable
+import database.UsersTable
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -62,7 +62,7 @@ object DatabaseFactory {
                 try {
                     // ✅ Create tables in correct order (dependencies first)
                     SchemaUtils.createMissingTablesAndColumns(
-                        StudentsTable,
+                        UsersTable,
                         EventsTable,
                         EventRegistrationsTable
                     )
