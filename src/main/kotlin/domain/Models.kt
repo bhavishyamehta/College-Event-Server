@@ -1,4 +1,4 @@
-package com.example.domain
+package domain
 
 import kotlinx.serialization.Serializable
 
@@ -55,10 +55,18 @@ data class CreateEventRequest(
 )
 
 @Serializable
+data class CreateEventResponse(
+    val success: Boolean,
+    val message: String,
+    val id: String
+)
+
+@Serializable
 data class EventSummaryResponse(
     val id: String,
     val title: String,
     val clubName: String,
+    val bannerUrl: String,
     val date: String,
     val time: String,
     val venue: String,

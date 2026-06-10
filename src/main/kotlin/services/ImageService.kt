@@ -16,6 +16,7 @@ import java.awt.image.BufferedImage
 import javax.imageio.IIOImage
 import javax.imageio.ImageWriteParam
 import kotlin.math.roundToInt
+import io.ktor.utils.io.core.readBytes
 
 object ImageService {
     // ⭐ UPDATED CLIENT WITH TIMEOUT
@@ -51,7 +52,8 @@ object ImageService {
                 }
             }
             val imageData = filePart ?: throw IllegalArgumentException("No image found in request")
-            val originalBytes = imageData.streamProvider().readBytes()
+
+            val originalBytes = imageData.provider().readBytes()
 
             val compressedBytes = compressImage(originalBytes)
 

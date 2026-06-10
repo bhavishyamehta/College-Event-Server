@@ -1,9 +1,10 @@
 package routes
 
-import com.example.domain.GenericResponse
-import com.example.domain.LoginRequest
-import com.example.domain.RegisterRequest
+import domain.GenericResponse
+import domain.LoginRequest
+import domain.RegisterRequest
 import io.ktor.http.*
+import io.ktor.server.application.call
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*

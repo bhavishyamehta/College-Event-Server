@@ -3,6 +3,7 @@ import io.ktor.server.response.respondText
 import io.ktor.server.routing.*
 import routes.authRouting
 import routes.eventRouting
+import routes.imageRoutes
 import routes.userRouting
 import services.AuthService
 import services.EventService
@@ -21,5 +22,6 @@ fun Application.configureRouting(
         authRouting(authService)
         eventRouting(eventService)
         userRouting(userService)
+        imageRoutes()
     }
 }

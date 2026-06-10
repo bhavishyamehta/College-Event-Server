@@ -1,8 +1,10 @@
 package routes
 
-import com.example.domain.GenericResponse
-import com.example.domain.CreateEventRequest
+import domain.GenericResponse
+import domain.CreateEventRequest
+import domain.CreateEventResponse
 import io.ktor.http.*
+import io.ktor.server.application.call
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
@@ -40,7 +42,10 @@ fun Route.eventRouting(eventService: EventService) {
 
                 val generatedId = eventService.createEvent(req)
                 if (generatedId != null) {
-                    call.respond(HttpStatusCode.Created, mapOf("success" to true, "message" to "Event Created Successfully", "id" to generatedId))
+                    // ✅ mapOf() hatao
+                    call.respond(HttpStatusCode.Created,
+                        CreateEventResponse(true, "Event Created Successfully", generatedId)
+                    )
                 } else {
                     call.respond(HttpStatusCode.InternalServerError, GenericResponse(false, "Failed to create event entry"))
                 }

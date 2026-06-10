@@ -1,7 +1,7 @@
 package services
 
-import com.example.domain.EventSummaryResponse
-import com.example.domain.StudentProfileResponse
+import domain.EventSummaryResponse
+import domain.StudentProfileResponse
 import config.DatabaseFactory.dbQuery
 import database.EventRegistrationsTable
 import database.EventsTable
@@ -25,6 +25,7 @@ class UserService {
                     id = it[EventsTable.id],
                     title = it[EventsTable.title],
                     clubName = it[EventsTable.clubName],
+                    bannerUrl = it[EventsTable.bannerUrl],
                     date = it[EventsTable.eventDate],
                     time = it[EventsTable.eventTime],
                     venue = it[EventsTable.venue],

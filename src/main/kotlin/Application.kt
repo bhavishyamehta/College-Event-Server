@@ -6,6 +6,7 @@ import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import configureRouting
+import plugins.configureCORS
 import plugins.configureSecurity
 import plugins.configureSerialization
 import services.AuthService
@@ -60,6 +61,7 @@ fun Application.module() {
 
         // Config Plugins
         configureSecurity()
+        configureCORS()
         configureSerialization()
         configureRouting(authService, userService, eventService)
         println("Plugins configured successfully")

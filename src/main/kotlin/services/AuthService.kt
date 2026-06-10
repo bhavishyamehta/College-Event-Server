@@ -1,8 +1,8 @@
 package services
 
-import com.example.domain.AuthResponse
-import com.example.domain.LoginRequest
-import com.example.domain.RegisterRequest
+import domain.AuthResponse
+import domain.LoginRequest
+import domain.RegisterRequest
 import config.DatabaseFactory.dbQuery
 import database.UsersTable
 import domain.AuthJWT

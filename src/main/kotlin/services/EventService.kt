@@ -1,8 +1,8 @@
 package services
 
-import com.example.domain.CreateEventRequest
-import com.example.domain.EventDetailResponse
-import com.example.domain.EventSummaryResponse
+import domain.CreateEventRequest
+import domain.EventDetailResponse
+import domain.EventSummaryResponse
 import config.DatabaseFactory.dbQuery
 import database.EventRegistrationsTable
 import database.EventsTable
@@ -25,6 +25,7 @@ class EventService {
                 id = it[EventsTable.id],
                 title = it[EventsTable.title],
                 clubName = it[EventsTable.clubName],
+                bannerUrl = it[EventsTable.bannerUrl],
                 date = it[EventsTable.eventDate],
                 time = it[EventsTable.eventTime],
                 venue = it[EventsTable.venue],
