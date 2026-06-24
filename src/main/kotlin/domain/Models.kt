@@ -29,6 +29,7 @@ data class AuthResponse(
 @Serializable
 data class StudentProfileResponse(
     val id: String,
+    val profileImage: String? = "",
     val fullName: String,
     val enrollmentNumber: String,
     val branchDepartment: String,

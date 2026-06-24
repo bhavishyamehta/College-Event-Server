@@ -68,7 +68,7 @@ object DatabaseFactory {
                     )
                     println("✅ Database schema updated successfully")
                 } catch (e: Exception) {
-                    println("❌ ERROR creating schema: ${e.message}")
+                    println("ERROR creating schema: ${e.message}")
                     e.printStackTrace()
                     throw e
                 }

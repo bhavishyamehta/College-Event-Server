@@ -36,10 +36,10 @@ class UserService {
             emptyList()
         }
 
-        val userRole = studentRow[UsersTable.role]
 
         StudentProfileResponse(
             id = sId,
+            profileImage = studentRow[UsersTable.profileImage],
             fullName = studentRow[UsersTable.fullName],
             enrollmentNumber = studentRow[UsersTable.enrollmentNumber],
             branchDepartment = studentRow[UsersTable.branchDepartment],
@@ -47,7 +47,7 @@ class UserService {
             totalEvents = registeredEventsList.size,
             certificatesCount = studentRow[UsersTable.certificatesCount],
             registeredEvents = registeredEventsList,
-            role = userRole,
+            role = studentRow[UsersTable.role],
         )
     }
 }

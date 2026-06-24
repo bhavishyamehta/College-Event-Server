@@ -24,13 +24,14 @@ class AuthService(private val userService: UserService) {
 
         val insertStatement = UsersTable.insert {
             it[id] = "user-" + java.util.UUID.randomUUID().toString().take(8)
+            it[profileImage] = ""
             it[fullName] = req.fullName
             it[enrollmentNumber] = req.enrollmentNumber
             it[branchDepartment] = req.branchDepartment
             it[universityEmail] = req.universityEmail
             it[passwordHash] = hashedPassword
             it[certificatesCount] = 0
-            it[role] = formattedRole // 👈 Stores dynamic user level roles inside database engine table
+            it[role] = formattedRole // Stores dynamic user level roles inside database engine table
         }
 
         // Generate token injecting enrollment identity alongside user roles authorization claim attributes

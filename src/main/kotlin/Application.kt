@@ -47,11 +47,7 @@ fun Application.module() {
         throw e // Re-throw to prevent app from starting with broken DB
     }
 
-    databaseSeeder()  // seed data if empty
-
-    // Database Initiation
-    //DatabaseFactory0.init()
-
+    databaseSeeder()
 
     try {
         // Service Layer Mapping

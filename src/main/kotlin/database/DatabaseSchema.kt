@@ -5,6 +5,7 @@ import org.jetbrains.exposed.sql.Table
 object UsersTable : Table("users") {
     val id = varchar("id", 50)
     val role = varchar("role", 20).default("STUDENT") // STUDENT, TEACHER, ADMIN
+    val profileImage = varchar("profileImage", 150).default("")
     val fullName = varchar("full_name", 255)
     val enrollmentNumber = varchar("enrollment_number", 50).uniqueIndex()
     val branchDepartment = varchar("branch_department", 100)
