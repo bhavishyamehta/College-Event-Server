@@ -1,0 +1,33 @@
+# Version control
+.git
+.gitignore
+
+# IDE
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+
+# Gradle build artifacts (ye Docker ke andar hi generate honge)
+.gradle
+build/
+
+# Environment & secrets (Docker Compose env_file se separately inject hote hain)
+.env
+.env.local
+firebase-service-account.json
+*firebase*.json
+
+# Docs & misc
+README.md
+*.md
+docs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/

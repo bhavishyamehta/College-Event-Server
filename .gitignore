@@ -1,6 +1,8 @@
+### Gradle ###
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
 
 ### IntelliJ IDEA ###
 .idea
@@ -11,4 +13,26 @@ out/
 
 ### Environmental variables ###
 .env
-src/main/kotlin/config/SupabaseConfig.kt
+.env.local
+.env.*.local
+
+### Firebase / Service Account Keys ###
+firebase-service-account.json
+*firebase*.json
+serviceAccountKey.json
+
+### Logs ###
+*.log
+logs/
+
+### OS files ###
+.DS_Store
+Thumbs.db
+
+### Kotlin/Java ###
+*.class
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+
+### Docker ###
+docker-compose.override.yml

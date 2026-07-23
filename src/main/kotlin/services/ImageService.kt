@@ -62,7 +62,7 @@ object ImageService {
 
             val timestamp = System.currentTimeMillis()
             val randomUUID = UUID.randomUUID().toString().take(8)
-            val newFileName = "projectStore/image_${timestamp}_${randomUUID}.$fileExtension"
+            val newFileName = "collegeEvent/image_${timestamp}_${randomUUID}.$fileExtension"
 
             val response = client.put("$STORAGE_URL/${SupabaseConfig.STORAGE_BUCKET}/$newFileName") {
                 headers {

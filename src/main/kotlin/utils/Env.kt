@@ -109,67 +109,35 @@ object Env {
         println("DB_URL from environment: ${herokuUrl?.take(50)}...")
 
         if (herokuUrl != null && !herokuUrl.startsWith("jdbc:")) {
-            // Try to parse as Heroku format
+            // Try to parse as Heroku format (postgres://user:pass@host:port/db)
             val parsed = parseHerokuDatabaseUrl(herokuUrl)
             if (parsed != null) {
                 return@lazy parsed
             }
-
             println("WARNING: Failed to parse Heroku DB_URL, falling back to individual env vars")
-            // Fall back to individual env vars
-            val dbType = getEnv("DATABASE_TYPE", "postgresql")
-            DatabaseConfig(
-                jdbcUrl = getEnv(
-                    "DATABASE_URL", when (dbType.lowercase()) {
-                        "mysql" -> "jdbc:mysql://localhost:3306/college_event_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true"
-                        else -> "jdbc:postgresql://localhost:5432/college_event_db"
-                    }
-                ),
-                username = getEnv(
-                    "DB_USER", when (dbType.lowercase()) {
-                        "mysql" -> "root"
-                        else -> "postgres"
-                    }
-                ),
-                password = getEnv(
-                    "DB_PASSWORD", when (dbType.lowercase()) {
-                        "mysql" -> "root1234"
-                        else -> "root1234"
-                    }
-                ),
-                type = dbType
-            )
-        } else {
-            // Already in JDBC format or using individual env vars
-            val dbType = getEnv("DATABASE_TYPE", "postgresql")
-            DatabaseConfig(
-                jdbcUrl = getEnv(
-                    "DATABASE_URL", when (dbType.lowercase()) {
-                        "mysql" -> "jdbc:mysql://localhost:3306/college_event_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true"
-                        else -> "jdbc:postgresql://localhost:5432/college_event_db"
-                    }
-                ),
-                username = getEnv(
-                    "DB_USER", when (dbType.lowercase()) {
-                        "mysql" -> "root"
-                        else -> "postgres"
-                    }
-                ),
-                password = getEnv(
-                    "DB_PASSWORD", when (dbType.lowercase()) {
-                        "mysql" -> "root1234"
-                        else -> "root1234"
-                    }
-                ),
-                type = dbType
-            )
         }
+
+        val dbType = getEnv("DATABASE_TYPE", "mysql")
+        DatabaseConfig(
+            jdbcUrl = herokuUrl ?: getEnv(
+                "DB_URL", when (dbType.lowercase()) {
+                    "mysql" -> "jdbc:mysql://localhost:3306/college_event_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true"
+                    else -> "jdbc:postgresql://localhost:5432/college_event_db"
+                }
+            ),
+            username = getEnv("DB_USER", if (dbType.lowercase() == "mysql") "root" else "postgres"),
+            password = getEnv("DB_PASSWORD", "root1234"),
+            type = dbType
+        )
     }
 
     val DATABASE_TYPE = databaseConfig.type
     val DB_URL = databaseConfig.jdbcUrl
     val DB_USER = databaseConfig.username
     val DB_PASSWORD = databaseConfig.password
+    val SUPABASE_URL = getEnv("SUPABASE_URL", "")
+    val SUPABASE_KEY = getEnv("SUPABASE_KEY", "")
+    val STORAGE_BUCKET = getEnv("STORAGE_BUCKET", "")
 
     val JWT_SECRET = getEnv("JWT_SECRET", "default-secret-change-in-production")
     // Access token expires in 15 minutes (short-lived for security)
@@ -185,23 +153,10 @@ object Env {
         get() = getInt("PORT", default = 8080)
 
     // ── Database ──────────────────────────────────────────────────────────────
-//    val DB_URL: String
-//        get() = require("DB_URL")
-
-
     val DB_POOL_SIZE: Int
         get() = getInt("DB_POOL_SIZE", default = 10)
 
     // ── JWT ───────────────────────────────────────────────────────────────────
-//    val JWT_SECRET: String
-//        get() = require("JWT_SECRET")
-
-    /*val JWT_ISSUER: String
-        get() = get("JWT_ISSUER", default = "college_event_students")
-
-    val JWT_AUDIENCE: String
-        get() = get("JWT_AUDIENCE", default = "college_event_students-users")*/
-
     val JWT_REALM: String
         get() = get("JWT_REALM", default = "college_event_students")
 
@@ -211,7 +166,6 @@ object Env {
     // ── Firebase ──────────────────────────────────────────────────────────────
     val FIREBASE_SERVICE_ACCOUNT_PATH: String
         get() = get("FIREBASE_SERVICE_ACCOUNT_PATH", default = "firebase-service-account.json")
-
 
     // ── Seeding ───────────────────────────────────────────────────────────────
     val SEED_DATABASE: Boolean
@@ -259,7 +213,6 @@ object Env {
         return System.getenv(key)                            // real OS env
             ?: System.getProperty(key)                       // set by loadDotEnv()
     }
-
 
     private fun require(key: String): String {
         return read(key)?.takeIf { it.isNotBlank() }
