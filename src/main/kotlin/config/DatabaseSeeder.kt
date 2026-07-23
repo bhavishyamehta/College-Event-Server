@@ -10,6 +10,7 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt
+import utils.Env
 import java.util.UUID
 
 private val logger = KotlinLogging.logger {}
@@ -52,6 +53,12 @@ private data class SeedEvent(
 
 fun Application.databaseSeeder() {
     environment.monitor.subscribe(ApplicationStarted) {
+        //  Respect the SEED_DATABASE flag — production mein ye false hona chahiye
+        if (!Env.SEED_DATABASE) {
+            logger.info { "Database seeding skipped (SEED_DATABASE=false)" }
+            return@subscribe
+        }
+
         try {
             transaction {
                 // Idempotency guard — check if the core student already exists
@@ -64,7 +71,7 @@ fun Application.databaseSeeder() {
                     return@transaction
                 }
 
-                logger.info { "🚀 Seeding Role-Based College Users and UI-Matched Events..." }
+                logger.info { "Seeding Role-Based College Users and UI-Matched Events..." }
 
                 seedUsers()
                 seedEvents()
@@ -92,7 +99,7 @@ fun Application.databaseSeeder() {
                 }
             }
         } catch (e: Exception) {
-            logger.error(e) { "❌ ERROR in college database seeding: ${e.message}" }
+            logger.error(e) { "ERROR in college database seeding: ${e.message}" }
         }
     }
 }

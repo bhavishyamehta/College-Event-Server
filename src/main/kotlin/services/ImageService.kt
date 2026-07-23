@@ -37,7 +37,7 @@ object ImageService {
         }
     }
 
-    private const val STORAGE_URL = "${SupabaseConfig.SUPABASE_URL}/storage/v1/object"
+    private val STORAGE_URL = "${SupabaseConfig.SUPABASE_URL}/storage/v1/object"
     private const val TARGET_SIZE_KB = 100
     private const val MAX_DIMENSION = 1024
 

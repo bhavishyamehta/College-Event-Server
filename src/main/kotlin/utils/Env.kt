@@ -169,7 +169,7 @@ object Env {
 
     // ── Seeding ───────────────────────────────────────────────────────────────
     val SEED_DATABASE: Boolean
-        get() = read("SEED_DATABASE")?.trim()?.lowercase() == "true"
+        get() = read("SEED_DATABASE")?.trim()?.lowercase() == "false"
 
     // ══════════════════════════════════════════════════════════════════════════
     // Startup validation
