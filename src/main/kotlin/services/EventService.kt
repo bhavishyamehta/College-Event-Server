@@ -29,19 +29,22 @@ class EventService {
                 date = it[EventsTable.eventDate],
                 time = it[EventsTable.eventTime],
                 venue = it[EventsTable.venue],
-                registrationBadge = it[EventsTable.statusBadge]
+                registrationBadge = it[EventsTable.statusBadge],
+                createdBy = it[EventsTable.createdBy]
             )
         }
     }
 
     suspend fun getEventDetail(eventId: String, enrollmentNo: String): EventDetailResponse? = dbQuery {
         val eventRow = EventsTable.select { EventsTable.id eq eventId }.singleOrNull() ?: return@dbQuery null
-        val studentRow = UsersTable.select { UsersTable.enrollmentNumber eq enrollmentNo }.singleOrNull() ?: return@dbQuery null
-        
+        val studentRow =
+            UsersTable.select { UsersTable.enrollmentNumber eq enrollmentNo }.singleOrNull() ?: return@dbQuery null
+
         val studentId = studentRow[UsersTable.id]
-        
+
         // Count actual registrations for this event
-        val currentRegsCount = EventRegistrationsTable.select { EventRegistrationsTable.eventId eq eventId }.count().toInt()
+        val currentRegsCount =
+            EventRegistrationsTable.select { EventRegistrationsTable.eventId eq eventId }.count().toInt()
         val totalSeats = eventRow[EventsTable.totalSeats]
         val spotsLeft = (totalSeats - currentRegsCount).coerceAtLeast(0)
 
@@ -60,14 +63,17 @@ class EventService {
             description = eventRow[EventsTable.description],
             seatAvailability = "Spots Left: $spotsLeft",
             registrationFee = eventRow[EventsTable.registrationFee],
-            isUserRegistered = isRegistered
+            isUserRegistered = isRegistered,
+            creatorId = eventRow[EventsTable.creatorId],   // ✅ new
+            createdBy = eventRow[EventsTable.createdBy]
         )
     }
 
     suspend fun registerForEvent(eventId: String, enrollmentNo: String): Boolean = dbQuery {
-        val studentRow = UsersTable.select { UsersTable.enrollmentNumber eq enrollmentNo }.singleOrNull() ?: return@dbQuery false
+        val studentRow =
+            UsersTable.select { UsersTable.enrollmentNumber eq enrollmentNo }.singleOrNull() ?: return@dbQuery false
         val sId = studentRow[UsersTable.id]
-        
+
         // Already registered validation
         val alreadyExists = EventRegistrationsTable.select {
             (EventRegistrationsTable.studentId eq sId) and (EventRegistrationsTable.eventId eq eventId)
@@ -76,7 +82,8 @@ class EventService {
 
         // Capacity check
         val eventRow = EventsTable.select { EventsTable.id eq eventId }.singleOrNull() ?: return@dbQuery false
-        val currentRegsCount = EventRegistrationsTable.select { EventRegistrationsTable.eventId eq eventId }.count().toInt()
+        val currentRegsCount =
+            EventRegistrationsTable.select { EventRegistrationsTable.eventId eq eventId }.count().toInt()
         if (currentRegsCount >= eventRow[EventsTable.totalSeats]) return@dbQuery false // Housefull
 
         EventRegistrationsTable.insert {
@@ -88,7 +95,8 @@ class EventService {
     }
 
     suspend fun deregisterFromEvent(eventId: String, enrollmentNo: String): Boolean = dbQuery {
-        val studentRow = UsersTable.select { UsersTable.enrollmentNumber eq enrollmentNo }.singleOrNull() ?: return@dbQuery false
+        val studentRow =
+            UsersTable.select { UsersTable.enrollmentNumber eq enrollmentNo }.singleOrNull() ?: return@dbQuery false
         val sId = studentRow[UsersTable.id]
 
         val deletedCount = EventRegistrationsTable.deleteWhere {
@@ -98,7 +106,10 @@ class EventService {
     }
 
     // ── 1. CREATE EVENT (Accessible only by TEACHER/ADMIN) ───────────────────
-    suspend fun createEvent(req: CreateEventRequest): String? = dbQuery {
+    suspend fun createEvent(req: CreateEventRequest, enrollmentNo: String): String? = dbQuery {
+        val teacherRow = UsersTable.select { UsersTable.enrollmentNumber eq enrollmentNo }.singleOrNull()
+            ?: return@dbQuery null   // safety: agar teacher record hi nahi mila
+
         val newId = "event-" + UUID.randomUUID().toString().take(8)
 
         EventsTable.insert {
@@ -114,6 +125,8 @@ class EventService {
             it[registrationFee] = req.registrationFee
             it[category] = req.category
             it[statusBadge] = req.statusBadge
+            it[creatorId] = teacherRow[UsersTable.id]
+            it[createdBy] = teacherRow[UsersTable.fullName]
         }
         newId
     }

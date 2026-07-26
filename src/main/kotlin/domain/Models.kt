@@ -52,7 +52,9 @@ data class CreateEventRequest(
     val totalSeats: Int,
     val registrationFee: String,
     val category: String,
-    val statusBadge: String = "Registration Open"
+    val statusBadge: String = "Registration Open",
+    val creatorId: String,
+    val createdBy: String
 )
 
 @Serializable
@@ -71,7 +73,8 @@ data class EventSummaryResponse(
     val date: String,
     val time: String,
     val venue: String,
-    val registrationBadge: String // e.g., "Registration Open", "Starts in 2 Days"
+    val registrationBadge: String, // e.g., "Registration Open", "Starts in 2 Days"
+    val createdBy: String
 )
 
 @Serializable
@@ -86,7 +89,9 @@ data class EventDetailResponse(
     val description: String,
     val seatAvailability: String, // e.g., "Seat 34/50" or "Spots Left: 12"
     val registrationFee: String,   // e.g., "$15.00" or "Free"
-    val isUserRegistered: Boolean
+    val isUserRegistered: Boolean,
+    val creatorId: String,
+    val createdBy: String
 )
 
 @Serializable

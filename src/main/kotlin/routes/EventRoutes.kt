@@ -30,8 +30,8 @@ fun Route.eventRouting(eventService: EventService) {
             post {
                 val principal = call.principal<JWTPrincipal>()
                 val role = principal?.getClaim("role", String::class) ?: "STUDENT"
+                val enrollmentNo = principal?.getClaim("enrollmentNumber", String::class) ?: ""
 
-                // 🔴 AUTHORIZATION EDGE CASE SHIELD
                 if (role != "TEACHER" && role != "ADMIN") {
                     return@post call.respond(HttpStatusCode.Forbidden, GenericResponse(false, "Access Denied: Only Teachers or Admins can perform this action."))
                 }
@@ -40,9 +40,8 @@ fun Route.eventRouting(eventService: EventService) {
                     HttpStatusCode.BadRequest, GenericResponse(false, "Invalid Event Data Payload")
                 )
 
-                val generatedId = eventService.createEvent(req)
+                val generatedId = eventService.createEvent(req, enrollmentNo)   // ✅ enrollmentNo pass kiya
                 if (generatedId != null) {
-                    // ✅ mapOf() hatao
                     call.respond(HttpStatusCode.Created,
                         CreateEventResponse(true, "Event Created Successfully", generatedId)
                     )

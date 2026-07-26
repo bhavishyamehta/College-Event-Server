@@ -29,6 +29,8 @@ object EventsTable : Table("events") {
     val registrationFee = varchar("registration_fee", 50).default("Free")
     val category = varchar("category", 50) // Technical, Cultural, Sports, etc.
     val statusBadge = varchar("status_badge", 50).default("Registration Open")
+    val creatorId = varchar("creator_id", 100).references(UsersTable.id)
+    val createdBy = varchar("created_by", 150) // display name/email snapshot
 
     override val primaryKey = PrimaryKey(id)
 }

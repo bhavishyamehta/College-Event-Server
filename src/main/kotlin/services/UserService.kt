@@ -29,7 +29,8 @@ class UserService {
                     date = it[EventsTable.eventDate],
                     time = it[EventsTable.eventTime],
                     venue = it[EventsTable.venue],
-                    registrationBadge = it[EventsTable.statusBadge]
+                    registrationBadge = it[EventsTable.statusBadge],
+                    createdBy = it[EventsTable.createdBy],
                 )
             }
         } else {

@@ -210,8 +210,9 @@ object Env {
      *   real OS env  >  System property (set by loadDotEnv in Application.kt)
      */
     private fun read(key: String): String? {
-        return System.getenv(key)                            // real OS env
-            ?: System.getProperty(key)                       // set by loadDotEnv()
+        return System.getenv(key)                    // real OS env
+            ?: properties.getProperty(key)            // .env file (loaded internally)
+            ?: System.getProperty(key)                // fallback: System property (loadDotEnv in Application.kt)
     }
 
     private fun require(key: String): String {

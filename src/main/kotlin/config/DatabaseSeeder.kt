@@ -16,13 +16,13 @@ import java.util.UUID
 private val logger = KotlinLogging.logger {}
 
 // ── Fixed UUID IDs for cross-references ──────────────────────────────────────
-private const val STUDENT_ALEX_ID  = "seed-stud-alex-0000-000000000001"
+private const val STUDENT_ALEX_ID = "seed-stud-alex-0000-000000000001"
 private const val TEACHER_VIKRAM_ID = "seed-tech-vikr-0000-000000000002"
-private const val ADMIN_NEHA_ID     = "seed-admn-neha-0000-000000000003"
+private const val ADMIN_NEHA_ID = "seed-admn-neha-0000-000000000003"
 
-private const val EVENT_TECH_ID   = "seed-even-tech-0000-000000000010"
-private const val EVENT_BANDS_ID  = "seed-even-band-0000-000000000011"
-private const val EVENT_UIUX_ID   = "seed-even-uiux-0000-000000000012"
+private const val EVENT_TECH_ID = "seed-even-tech-0000-000000000010"
+private const val EVENT_BANDS_ID = "seed-even-band-0000-000000000011"
+private const val EVENT_UIUX_ID = "seed-even-uiux-0000-000000000012"
 private const val EVENT_BASKET_ID = "seed-even-bask-0000-000000000013"
 
 private data class SeedUser(
@@ -48,7 +48,9 @@ private data class SeedEvent(
     val totalSeats: Int,
     val registrationFee: String,
     val category: String,
-    val statusBadge: String
+    val statusBadge: String,
+    val creatorId: String,
+    val createdBy: String
 )
 
 fun Application.databaseSeeder() {
@@ -167,7 +169,9 @@ private fun seedEvents() {
             totalSeats = 100,
             registrationFee = "$15.00",
             category = "Technical",
-            statusBadge = "TRENDING"
+            statusBadge = "TRENDING",
+            creatorId = TEACHER_VIKRAM_ID,          // ✅ new
+            createdBy = "Prof. Vikram Malhotra"      // ✅ new
         ),
         SeedEvent(
             id = EVENT_BANDS_ID,
@@ -181,7 +185,9 @@ private fun seedEvents() {
             totalSeats = 500,
             registrationFee = "Free",
             category = "Cultural",
-            statusBadge = "Registration Open"
+            statusBadge = "Registration Open",
+            creatorId = ADMIN_NEHA_ID,               // ✅ new
+            createdBy = "Neha Sharma"                 // ✅ new
         ),
         SeedEvent(
             id = EVENT_UIUX_ID,
@@ -195,7 +201,9 @@ private fun seedEvents() {
             totalSeats = 40,
             registrationFee = "Free",
             category = "Technical",
-            statusBadge = "Registration Open"
+            statusBadge = "Registration Open",
+            creatorId = TEACHER_VIKRAM_ID,           // ✅ new
+            createdBy = "Prof. Vikram Malhotra"      // ✅ new
         ),
         SeedEvent(
             id = EVENT_BASKET_ID,
@@ -209,7 +217,9 @@ private fun seedEvents() {
             totalSeats = 150,
             registrationFee = "Free",
             category = "Sports",
-            statusBadge = "Starts in 2 Days"
+            statusBadge = "Starts in 2 Days",
+            creatorId = ADMIN_NEHA_ID,               // ✅ new
+            createdBy = "Neha Sharma"                 // ✅ new
         )
     )
 
@@ -227,6 +237,8 @@ private fun seedEvents() {
             it[registrationFee] = event.registrationFee
             it[category] = event.category
             it[statusBadge] = event.statusBadge
+            it[creatorId] = event.creatorId           // ✅ new
+            it[createdBy] = event.createdBy           // ✅ new
         }
         logger.debug { "  Seeded Event: ${event.title}" }
     }
